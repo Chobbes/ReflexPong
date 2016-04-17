@@ -14,7 +14,7 @@ pongSimulate (_,my) step state = state { ballState = newBall
                                        }
   where movedBall = advanceBall (ballState state)
         advanceBall (Ball (px,py) (vx,vy)) = Ball (px + step * vx, py + step * vy) (vx,vy)
-        collision = ballCollisions state (traceShow (ballPos movedBall) movedBall)
+        collision = ballCollisions state movedBall
         newBall = case collision of
                     Nothing -> movedBall
                     Just refAxis -> movedBall {ballVel = reflect refAxis (ballVel movedBall)}
@@ -34,15 +34,15 @@ ballCollisions state ball = wallCollide <|> enemyCollide <|> playerCollide
 
 
 ballPaddleCollide :: Float -> Float -> Vector -> Vector -> Ball -> Maybe Vector
-ballPaddleCollide x y topV bottomV (Ball (bx,by) _) =
+ballPaddleCollide x y topV bottomV (Ball (ballX,ballY) _) =
                   if inYRange && inXRange
                      then Just paddleNorm
                      else Nothing
-  where inYRange = by - ballRadius <= y + h && by + ballRadius >= y - h
-        inXRange = bx - ballRadius <= x + w && bx + ballRadius >= x - w
+  where inYRange = ballY - ballRadius <= y + h && ballY + ballRadius >= y - h
+        inXRange = ballX - ballRadius <= x + w && ballX + ballRadius >= x - w
 
-        paddleNorm = let v = (tx + bx, ty + by) in traceShow bx v
-          where relY = (by - y + h) / paddleHeight
+        paddleNorm = normalizeV (tx + bx, ty + by)
+          where relY = (ballY - y + h) / paddleHeight
                 (tx, ty) = relY `mulSV` topV
                 (bx, by) = (1 - relY) `mulSV` bottomV
 
