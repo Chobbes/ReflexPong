@@ -6,12 +6,22 @@ import Graphics.Gloss.Data.Color
 
 
 renderPong :: PongState -> Picture
-renderPong (PongState (Ball (bx,by) _) py ey) = Pictures [playerPaddle, ball, enemyPaddle, walls]
-  where playerPaddle = drawPaddle playerColour playerX py paddleWidth paddleHeight
-        enemyPaddle = drawPaddle enemyColour enemyX ey paddleWidth paddleHeight
-        ball = color ballColour (translate bx by (circle ballRadius))
-        walls = color wallColour (rectangleWire (wallRight - wallLeft) (wallTop - wallBottom))
+renderPong (PongState ball playerPaddle enemyPaddle) = 
+  Pictures [playerPic, ballPic, enemyPic, wallPic]
+
+  where playerPic = drawSolidBox playerColour playerPaddle
+        enemyPic = drawSolidBox enemyColour enemyPaddle
+        ballPic = drawBall ballColour ball
+        wallPic = drawWireBox wallColour wallBox
 
 
-drawPaddle :: Color -> Float -> Float -> Float -> Float -> Picture
-drawPaddle c x y w h = translate x y (color c (rectangleSolid w h))
+drawSolidBox :: Color -> Box -> Picture
+drawSolidBox c (Box (x,y) w h) = translate x y (color c (rectangleSolid w h))
+
+
+drawWireBox :: Color -> Box -> Picture
+drawWireBox c (Box (x,y) w h) = translate x y (color c (rectangleWire w h))
+
+
+drawBall :: Color -> Ball -> Picture
+drawBall c (Ball (x,y) _) = translate x y (color c (circle ballRadius))

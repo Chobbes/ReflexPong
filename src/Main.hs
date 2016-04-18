@@ -32,4 +32,7 @@ glossPong refreshEvents inputEvents =
      -- Run simulation and render.
      sim <- foldDyn (uncurry pongSimulate) start comb
      return . fmap renderPong $ current sim
-  where start = PongState (Ball (0,0) (300,300)) 0 0
+
+  where start = PongState (Ball (0,0) (600,600)) player enemy
+        player = Box (playerX, 0) paddleWidth paddleHeight
+        enemy = Box (enemyX, 0) paddleWidth paddleHeight
